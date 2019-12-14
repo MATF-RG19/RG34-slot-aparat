@@ -4,6 +4,11 @@
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
+#include <string.h>
+#define MAX 1000
+
+#include "kordinatni.h"
+#include "crtanje.h"
 
 float Xeye=0.7, Yeye=0, Zeye=2.8;
 int a=0, b=0, c=0, d=0, e=0, f=0, g=0;
@@ -12,17 +17,24 @@ static void on_display(void);
 static void on_reshape(int width,int height);
 static void on_keyboard(unsigned char key, int x, int y);
 static void setting_light(void);
-static void draw_coordinate_lines(void);
-static void draw_element_fire();
-static void draw_diamond(void);
-static void draw_green(void);
+// static void draw_element_fire();
+// static void draw_diamond(void);
+// static void draw_green(void);
 static void congrats(int i);
 static void on_timer(int value);
-static void draw_star(double boja1, double boja2, double boja3);
+// static void draw_star(double boja1, double boja2, double boja3);
+// static void draw_button(double a, double b, double c);
+static void on_mouse(int button, int state, int x, int y);
+//static void animacija(void);
+void drawString(float x, float y, float z, char *string) ;
+//static void pomocni_prozor(void);
 
 static int window_width, window_height;
 static float vreme;
 static int timer_active;
+static int broj_kredit=15, broj_pobede=0, broj_pokusaji=0;
+static int uzbuna=0;
+
 
 int main(int argc, char **argv)
 {
@@ -34,6 +46,7 @@ int main(int argc, char **argv)
     glutCreateWindow(argv[0]);
     
     glutKeyboardFunc(on_keyboard);
+    glutMouseFunc(on_mouse);
     glutDisplayFunc(on_display);
     glutReshapeFunc(on_reshape);
 
@@ -44,6 +57,108 @@ int main(int argc, char **argv)
     glutMainLoop();
 
     return 0;
+}
+
+static void on_mouse(int button, int state, int x, int y)
+{
+    if(button==GLUT_LEFT_BUTTON && state==1){
+    
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    
+    GLdouble modelview[16];
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+        glLoadIdentity();
+        gluLookAt(Xeye, Yeye, Zeye,0,0,0,1,0,0); 
+        glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glPopMatrix();
+    
+    GLdouble projection[16];
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    
+    double winX=(double) x;
+    double winY=viewport[3] - (double)y;
+    
+    double rezs[3];
+    double reze[3];
+    
+    
+    
+    gluUnProject(winX, winY, 1.0, modelview, projection, 
+             viewport, &reze[0], &reze[1], &reze[2]); 
+    
+    rezs[0] = Xeye;
+    rezs[1] = Yeye;
+    rezs[2] = Zeye;
+    
+    
+    //razdaljina centra sfere do prave centar:-0.6, 0.3, 1.5 i -0.6, -0.3, 1.5
+    double c1x=-0.6, c1y=0.3, c1z=1.5, distance1=0, distance2=0, korak1=0, korak2=0;
+    double vektor_prave[3];
+    vektor_prave[0]=reze[0]-rezs[0];
+    vektor_prave[1]=reze[1]-rezs[1];
+    vektor_prave[2]=reze[2]-rezs[2];
+
+    double norma_vektor_prave=sqrt(pow(vektor_prave[0], 2)+pow(vektor_prave[1], 2)+pow(vektor_prave[2], 2));
+    
+    korak1=fabs((reze[0]-rezs[0])*(rezs[0]-c1x)+
+                  (reze[1]-rezs[1])*(rezs[1]-c1y)+
+                  (reze[2]-rezs[2])*(rezs[2]-c1z))/
+                  norma_vektor_prave;
+    
+    double c2x=-0.6, c2y=-0.3, c2z=1.5;
+    
+    korak2=fabs((reze[0]-rezs[0])*(rezs[0]-c2x)+
+                  (reze[1]-rezs[1])*(rezs[1]-c2y)+
+                  (reze[2]-rezs[2])*(rezs[2]-c2z))/
+                  norma_vektor_prave;
+                  
+                  
+    //rezs + vektor_prave*korak1
+    double N1[3], N2[3];
+    
+    N1[0]=rezs[0] + vektor_prave[0]/norma_vektor_prave*korak1;
+    N1[1]=rezs[1] + vektor_prave[1]/norma_vektor_prave*korak1;
+    N1[2]=rezs[2] + vektor_prave[2]/norma_vektor_prave*korak1;
+    
+ 
+    distance1=sqrt(pow(N1[0]-c1x,2)+pow(N1[1]-c1y, 2)+pow(N1[2]-c1z,2));
+    
+    N2[0]=rezs[0] + vektor_prave[0]/norma_vektor_prave*korak2;
+    N2[1]=rezs[1] + vektor_prave[1]/norma_vektor_prave*korak2;
+    N2[2]=rezs[2] + vektor_prave[2]/norma_vektor_prave*korak2;
+    
+    distance2=sqrt(pow(N2[0]-c2x,2)+pow(N2[1]-c2y, 2)+pow(N2[2]-c2z,2));
+
+    if(distance1<=0.1 && uzbuna==0)
+    {
+    srand(time(NULL));
+    a=rand()%3+1;
+    b=rand()%3+1;
+    c=rand()%3+1;
+    broj_pokusaji++;
+    broj_kredit--;
+    if(a==b && b==c && a!=0){
+        broj_pobede++;
+        broj_kredit=broj_kredit+2;}
+    glutPostRedisplay();
+    }
+    else if(distance2<=0.1 && uzbuna==0 && broj_kredit>=2)
+    {
+    srand(time(NULL));
+    d=rand()%4+1;
+    e=rand()%4+1;
+    f=rand()%4+1;
+    g=rand()%4+1;
+    broj_pokusaji++;
+    broj_kredit=broj_kredit-2;
+    if(d==e && e==f && f==g && d!=0){
+        broj_pobede++;
+        broj_kredit=broj_kredit+4;}
+    glutPostRedisplay();
+    }
+    }
 }
 
 void on_keyboard(unsigned char key, int x, int y)
@@ -74,29 +189,12 @@ case 'd':
 Xeye += 0.1;
 glutPostRedisplay();
 break;
-    
-case  'k':
-    srand(time(NULL));
-    a=rand()%3+1;
-    b=rand()%3+1;
-    c=rand()%3+1;
-    glutPostRedisplay();
-break;
 
 case 'l':
     srand(time(NULL));
     a=rand()%3+1;
     b=a;
     c=a;
-    glutPostRedisplay();
-break;
-
-case  'n':
-    srand(time(NULL));
-    d=rand()%4+1;
-    e=rand()%4+1;
-    f=rand()%4+1;
-    g=rand()%4+1;
     glutPostRedisplay();
 break;
 
@@ -108,7 +206,14 @@ case  'm':
     g=d;
     glutPostRedisplay();
 break;
-    
+
+case 'r':
+    uzbuna=0;
+    broj_kredit=15;
+    broj_pobede=0;
+    broj_pokusaji=0;
+    glutPostRedisplay();
+break;    
     }
 }
 
@@ -180,7 +285,8 @@ static void on_display(void)
     //podesava se vidna tacka
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(Xeye, Yeye, Zeye,0,0,0,1,0,0);   
+    gluLookAt(Xeye, Yeye, Zeye,0,0,0,1,0,0); 
+    
 //-----------------ELEMENTI-NA-SCENI----------------------------------------
     draw_coordinate_lines();
     //kocka prva
@@ -223,6 +329,7 @@ static void on_display(void)
         glVertex3f(-0.45,0,0.52);
         glVertex3f(0.45,0,0.52);
         
+        
          //donja kozola
          glColor3f(0,0,0.4);
          glVertex3f(0.45, 1, -0.51);
@@ -248,7 +355,28 @@ static void on_display(void)
         glVertex3f(-0.5,0,-0.5);
     glEnd();
     glPopMatrix();
-
+    
+    draw_button(-0.6, 0.3, 1.5);
+    draw_button(-0.6, -0.3, 1.5);
+    
+//--------------------TEXT--------------------------------------------
+    char pokusaji[MAX], kredit[MAX], pobede[MAX];
+    
+    sprintf(pokusaji, "POKUSAJI: %d", broj_pokusaji);
+    sprintf(kredit, "KREDIT: %d", broj_kredit);
+    sprintf(pobede, "POBEDE: %d", broj_pobede);
+    
+    if(broj_kredit<=0){
+        drawString(1.2, 0.4, 0.52, "Nemate dovoljno");
+        drawString(1, 0.4, 0.52, "Kredita");
+        drawString(0.8, 0.4, 0.52, "Pritisnite 'r'");
+        uzbuna=1;
+     }
+    else{
+    drawString(1.2, 0.3, 0.52, pokusaji);
+    drawString(1, 0.3, 0.52, kredit);
+    drawString(0.8, 0.3, 0.52, pobede);
+     }
 //-------------------------PRVA-IGRA----------------------------------
     if(a==0 && b==0 && c==0){
     glPushMatrix();
@@ -265,6 +393,7 @@ static void on_display(void)
     glTranslatef(0.5, -0.28, 0.8);
     draw_green();
     glPopMatrix();}
+    
     
     switch (a){
 
@@ -289,7 +418,7 @@ static void on_display(void)
     glPopMatrix();
     break;
     }
-
+    
     switch (b){
 
     case 1:
@@ -338,31 +467,32 @@ static void on_display(void)
     break;
     }
     
-    if(a==b && b==c && a!=0)
+    if(a==b && b==c && a!=0){
         congrats(1);
+    }
 //-------------------------DRUGA-IGRA-----------------------------------------
      if(d==0 && e==0 && f==0 && g==0){
     
     glPushMatrix();
-    glTranslatef(0.1, 0.3, 1.4);
+    glTranslatef(-0.1, 0.3, 1.4);
     glColor3f(0.6, 0.3, 0.9);
     glutSolidSphere(0.1, 50, 50); 
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(0.1, 0.1, 1.4);
+    glTranslatef(-0.1, 0.1, 1.4);
     glColor3f(0, 0.8, 0.2);
     glutSolidSphere(0.1, 50, 50);   
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(0.1, -0.1, 1.4);
+    glTranslatef(-0.1, -0.1, 1.4);
     glColor3f(0.9, 0.2, 0.8);
     glutSolidSphere(0.1, 50, 50);   
     glPopMatrix();
     
     glPushMatrix();
-    glTranslatef(0.1, -0.3, 1.4);
+    glTranslatef(-0.1, -0.3, 1.4);
     glColor3f(1, 0.7, 0.1);
     glutSolidSphere(0.1, 50, 50);
     glPopMatrix();
@@ -371,28 +501,28 @@ static void on_display(void)
     switch (d){
         case 1:
         glPushMatrix();
-        glTranslatef(0.1, 0.3, 1.4);
+        glTranslatef(-0.1, 0.3, 1.4);
         glColor3f(0.6, 0.3, 0.9);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 2:
         glPushMatrix();
-        glTranslatef(0.1, 0.3, 1.4);
+        glTranslatef(-0.1, 0.3, 1.4);
         glColor3f(0, 0.8, 0.2);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 3:
         glPushMatrix();
-        glTranslatef(0.1, 0.3, 1.4);
+        glTranslatef(-0.1, 0.3, 1.4);
         glColor3f(0.9, 0.2, 0.8);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 4:
         glPushMatrix();
-        glTranslatef(0.1, 0.3, 1.4);
+        glTranslatef(-0.1, 0.3, 1.4);
         glColor3f(1, 0.7, 0.1);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
@@ -402,28 +532,28 @@ static void on_display(void)
     switch (e){
         case 1:
         glPushMatrix();
-        glTranslatef(0.1, 0.1, 1.4);
+        glTranslatef(-0.1, 0.1, 1.4);
         glColor3f(0.6, 0.3, 0.9);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 2:
         glPushMatrix();
-        glTranslatef(0.1, 0.1, 1.4);
+        glTranslatef(-0.1, 0.1, 1.4);
         glColor3f(0, 0.8, 0.2);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 3:
         glPushMatrix();
-        glTranslatef(0.1, 0.1, 1.4);
+        glTranslatef(-0.1, 0.1, 1.4);
         glColor3f(0.9, 0.2, 0.8);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 4:
         glPushMatrix();
-        glTranslatef(0.1, 0.1, 1.4);
+        glTranslatef(-0.1, 0.1, 1.4);
         glColor3f(1, 0.7, 0.1);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
@@ -433,28 +563,28 @@ static void on_display(void)
     switch (f){
         case 1:
         glPushMatrix();
-        glTranslatef(0.1, -0.1, 1.4);
+        glTranslatef(-0.1, -0.1, 1.4);
         glColor3f(0.6, 0.3, 0.9);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 2:
         glPushMatrix();
-        glTranslatef(0.1, -0.1, 1.4);
+        glTranslatef(-0.1, -0.1, 1.4);
         glColor3f(0, 0.8, 0.2);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 3:
         glPushMatrix();
-        glTranslatef(0.1, -0.1, 1.4);
+        glTranslatef(-0.1, -0.1, 1.4);
         glColor3f(0.9, 0.2, 0.8);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 4:
         glPushMatrix();
-        glTranslatef(0.1, -0.1, 1.4);
+        glTranslatef(-0.1, -0.1, 1.4);
         glColor3f(1, 0.7, 0.1);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
@@ -463,39 +593,41 @@ static void on_display(void)
     switch (g){
         case 1:
         glPushMatrix();
-        glTranslatef(0.1, -0.3, 1.4);
+        glTranslatef(-0.1, -0.3, 1.4);
         glColor3f(0.6, 0.3, 0.9);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 2:
         glPushMatrix();
-        glTranslatef(0.1, -0.3, 1.4);
+        glTranslatef(-0.1, -0.3, 1.4);
         glColor3f(0, 0.8, 0.2);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 3:
         glPushMatrix();
-        glTranslatef(0.1, -0.3, 1.4);
+        glTranslatef(-0.1, -0.3, 1.4);
         glColor3f(0.9, 0.2, 0.8);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
         case 4:
         glPushMatrix();
-        glTranslatef(0.1, -0.3, 1.4);
+        glTranslatef(-0.1, -0.3, 1.4);
         glColor3f(1, 0.7, 0.1);
         glutSolidSphere(0.1, 50, 50); 
         glPopMatrix();
             break;
     } 
     
-    if(d==e && e==f && f==g && d!=0)
+    if(d==e && e==f && f==g && d!=0){
         congrats(2);
+    }
     
     glutSwapBuffers();
 }
+
 //---------------------TIMER-------------------------------------------------
 void on_timer(int value)
 {
@@ -608,202 +740,49 @@ void congrats(int i)
      timer_active=0;
     }
 }
-//----------------------ZVEZDA---------------------------------------------
-void draw_star(double boja1, double boja2, double boja3)
-{
-    glPushMatrix();
-    glScalef(0.03, 0.03, 0.03);
-    glColor3f(boja1, boja2, boja3);
-    glBegin(GL_TRIANGLES);
-         glVertex3f(0, 1.5, 0);
-         glVertex3f(-0.5, 0.5, 0);
-         glVertex3f(0.5, 0.5, 0);
-         glEnd();
-         
-         glBegin(GL_TRIANGLES);
-         glVertex3f(-0.5, 0.5, 0);
-         glVertex3f(-1.5, 0, 0);
-         glVertex3f(-0.5, -0.5, 0);
-         glEnd();
-         
-         glBegin(GL_TRIANGLES);
-         glVertex3f(0.5, -0.5, 0);
-         glVertex3f(1.5, 0, 0);
-         glVertex3f(0.5, 0.5, 0);
-         glEnd();
-         glBegin(GL_TRIANGLES);
-         glVertex3f(-0.5, -0.5, 0);
-         glVertex3f(0, -1.5, 0);
-         glVertex3f(0.5, -0.5, 0);
-         glEnd();
-         
-         glColor3f(boja1+0.1, boja2-0.1, boja3-0.1);
-         glBegin(GL_QUADS);
-         glVertex3f(-0.5, -0.5, 0);
-         glVertex3f(0.5, -0.5, 0);
-         glVertex3f(0.5, 0.5, 0);
-         glVertex3f(-0.5, 0.5, 0);
-         glEnd();
-    glPopMatrix();
+//------------------------------TEXT-------------------------------------------
+void drawString(float x, float y, float z, char *string) {
+  glRasterPos3f(x, y, z);
+  glColor3f(1,1,1);
+
+  for (char* cc = string; *cc != '\0'; cc++) {
+    glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *cc);
+  }
 }
-//---------------------VATRA------------------------------------------------
-void draw_element_fire()
+//---------------------------ANIMACIJA-NA-KLIK---------------------------------
+/*static void animacija(void)
 {
+   srand(time(NULL));
+    vreme=0;
+    
+    glutTimerFunc(1, on_timer, 0);
+    timer_active=1;
+    
+    for(int j=1; j<=15; j++){
+        
+        double rr=rand()%100, bb=rand()%100, gg=rand()%100;
+        rr/=100;
+        bb/=100;
+        gg/=100;
+        
         glPushMatrix();
-         glTranslatef(-0.5, -0.3, -0.35);
-          glScalef(0.5, 0.4, 0.4);
-        
-        glBegin( GL_TRIANGLE_STRIP);
-            glColor3f( 1.0, 0, 0);
-            
-            glVertex3f(1.2,0.75,1);
-            glVertex3f(1.1, 0.92, 0.8);
-            
-            glVertex3f(1,1,1);
-            glVertex3f(0.9,0.92,0.8);
-            
-            glVertex3f(0.8,0.85,1);
-            glVertex3f(0.8,0.75,0.8);
-            
-            glVertex3f(0.8,0.65,1);
-            glVertex3f(0.9,0.52,0.8);       
-            
-            glVertex3f(1,0.5,1);
-            glVertex3f(1.1, 0.52, 0.8);
-            
-            glVertex3f(1.2,0.75,1);
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_FAN);
-            glColor3f(1, 0.7, 0.1);
-        
-            glVertex3f(1.2,0.75,1);
-            glVertex3f(1,0.9,1.1);
-            glVertex3f(0.85,0.8,1.1);
-            glVertex3f(0.85,0.7,1.1);
-            glVertex3f(1,0.6,1.1);
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_FAN);
-            glColor3f(1,0.2,0);
-            
-            glVertex3f(1.2,0.75,1);
-            glVertex3f(1,1,1);
-            glVertex3f(0.8,0.85,1);
-            glVertex3f(0.8,0.65,1);
-            glVertex3f(1,0.5,1);
-        glEnd();
-        
-        //zuti deo
-         glBegin(GL_TRIANGLE_FAN);
-            glColor3f(1,0.2,0);
-            
-            glVertex3f(1.2,0.75,1);
-            glVertex3f(1.1, 0.92, 0.8);
-            glVertex3f(0.9,0.92,0.8);
-            glVertex3f(0.8,0.75,0.8);
-            glVertex3f(0.9,0.52,0.8);       
-            glVertex3f(1.1, 0.52, 0.8);
-        glEnd();
-        
+        glColor3f(rr, bb, gg);
+        glTranslatef(rr+0.5, bb+0.28, gg+ 0.8);
+        glutSolidSphere(0.01, 50, 50);
         glPopMatrix();
-    
+     }
+     timer_active=0; 
 }
-//----------------------DIJAMANT------------------------------------------
-void draw_diamond(void)
+//---------------------------POMOCNI-PROZOR------------------------------------
+void pomocni_prozor()
 {
-        glPushMatrix();
-        glTranslatef(-0.4, -0.5, -0.5);
-        glScalef(0.5, 0.5, 0.5);
-        glBegin(GL_TRIANGLE_FAN);
-        glColor3f(0.2, 0.8, 1);
-        
-        glVertex3f(1, 1, 1);
-        glVertex3f(0.8, 1.2, 1.2);
-        glVertex3f(0.8, 0.8, 1.2);
-        glVertex3f(0.8, 0.8, 0.8);
-        glVertex3f(0.8, 1.2, 0.8);       
-        glVertex3f(0.8, 1.2, 1.2);
-        glEnd();
-        
-        
-         glBegin(GL_TRIANGLE_FAN);
-         glColor3f(0, 0.8, 0.7);
-         glVertex3f(0.6, 1, 1);
-         glVertex3f(0.8, 1.2, 1.2);
-         glVertex3f(0.8, 0.8, 1.2);
-         glVertex3f(0.8, 0.8, 0.8);
-         glVertex3f(0.8, 1.2, 0.8);       
-         glVertex3f(0.8, 1.2, 1.2);
-         glEnd();
-         
-         glPopMatrix();
-     
+    glutInitWindowSize(700, 300);
+    glutInitWindowPosition( 800, 1000);
+    glutCreateWindow("KREDIT");
 }
-//---------------------ZELENA SFERA----------------------------------------
-void draw_green(void)
-{
-    glPushMatrix();
-    
-//     glTranslatef(0.3, 0, 1);
-    glColor3f(0, 0.8, 0.4);
-    glutSolidSphere(0.1, 50, 50);
-    
-    glPopMatrix();
-}
-//------------------------DUGME--------------------------------------------
-// void draw_button(void)
-// {
-//     
-//     
-// }
-//------------------------KOORDINATNI--------------------------------------
-void draw_coordinate_lines(void)
-{
-       glColor3f(1.0,0.0,0.0); // red x
-    glBegin(GL_LINES);
-    // x aix
- 
-    glVertex3f(-4.0, 0.0f, 0.0f);
-    glVertex3f(4.0, 0.0f, 0.0f);
- 
-    // arrow
-    glVertex3f(4.0, 0.0f, 0.0f);
-    glVertex3f(3.0, 1.0f, 0.0f);
- 
-    glVertex3f(4.0, 0.0f, 0.0f);
-    glVertex3f(3.0, -1.0f, 0.0f);
-    glEnd();
-    glFlush();
- 
- 
-    // y 
-    glColor3f(0.0,1.0,0.0); // green y
-    glBegin(GL_LINES);
-    glVertex3f(0.0, -4.0f, 0.0f);
-    glVertex3f(0.0, 4.0f, 0.0f);
- 
-    // arrow
-    glVertex3f(0.0, 4.0f, 0.0f);
-    glVertex3f(1.0, 3.0f, 0.0f);
- 
-    glVertex3f(0.0, 4.0f, 0.0f);
-    glVertex3f(-1.0, 3.0f, 0.0f);
-    glEnd();
-    glFlush();
- 
-    // z 
-    glColor3f(0.0,0.0,1.0); // blue z
-    glBegin(GL_LINES);
-    glVertex3f(0.0, 0.0f ,-4.0f );
-    glVertex3f(0.0, 0.0f ,4.0f );
- 
-    // arrow
-    glVertex3f(0.0, 0.0f ,4.0f );
-    glVertex3f(0.0, 1.0f ,3.0f );
- 
-    glVertex3f(0.0, 0.0f ,4.0f );
-    glVertex3f(0.0, -1.0f ,3.0f );
-    glEnd();
-    glFlush();
-}
+*/
+
+
+
+
+
