@@ -8,10 +8,11 @@
 #include "image.h"
 
 #define MAX 1000
+#define PI 3.14
 
 #define FILENAME0 "plava_pozadina.bmp"
 #define FILENAME1 "ekran.bmp"
-#define FILENAME2 "ekran.bmp"
+
 
 #include "kordinatni.h"
 #include "crtanje.h"
@@ -28,7 +29,7 @@ static void on_timer3(int value);
 void drawString(float x, float y, float z, char *string) ;
 static void initialize(void);
 
-float Xeye=0.7, Yeye=0, Zeye=2.8;
+float Xeye=0.7, Yeye=0, Zeye=4.2;
 int a=0, b=0, c=0, d=0, e=0, f=0, g=0;
 
 static int window_width, window_height;
@@ -38,7 +39,7 @@ static int broj_kredit=15, broj_pobede=0, broj_pokusaji=0;
 static int uzbuna=0;
 double alfa=0, beta=0;
 
-static GLuint names[3];
+static GLuint names[2];
 
 
 int main(int argc, char **argv)
@@ -56,7 +57,7 @@ int main(int argc, char **argv)
     glutDisplayFunc(on_display);
     glutReshapeFunc(on_reshape);
 
-    glClearColor(1,0.7,0.6, 0);
+    glClearColor(0.6, 0.6, 1, 0);
     glEnable(GL_DEPTH_TEST);
     glLineWidth(2);
     
@@ -109,21 +110,6 @@ static void initialize(void)
     image_read(image, FILENAME1);
  
     glBindTexture(GL_TEXTURE_2D, names[1]);
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-                 image->width, image->height, 0,
-                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
-    
-    image_read(image, FILENAME2);
- 
-    glBindTexture(GL_TEXTURE_2D, names[2]);
     glTexParameteri(GL_TEXTURE_2D,
                     GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D,
@@ -267,59 +253,59 @@ static void on_mouse(int button, int state, int x, int y)
 
 void on_keyboard(unsigned char key, int x, int y)
 {
-switch (key){
-    
-case 'q':
-/* Zavrsava se program. */
-exit(0);
-break;
+        switch (key){
+            
+        case 'q':
+        /* Zavrsava se program. */
+        exit(0);
+        break;
 
-case 's':
-Zeye += 0.1;
-glutPostRedisplay();
-break;
+        case 's':
+        Zeye += 0.1;
+        glutPostRedisplay();
+        break;
 
-case 'w':
-Zeye -= 0.1;
-glutPostRedisplay();
-break;
+        case 'w':
+        Zeye -= 0.1;
+        glutPostRedisplay();
+        break;
 
-case 'a':
-Xeye -= 0.1;
-glutPostRedisplay();
-break;
+        case 'a':
+        Xeye -= 0.1;
+        glutPostRedisplay();
+        break;
 
-case 'd':
-Xeye += 0.1;
-glutPostRedisplay();
-break;
+        case 'd':
+        Xeye += 0.1;
+        glutPostRedisplay();
+        break;
 
-//Pobeda u prvoj igri, cheat key
-case 'l':
-    a=rand()%3+1;
-    b=a;
-    c=a;
-    glutPostRedisplay();
-break;
+        //Pobeda u prvoj igri, cheat key
+        case 'l':
+            a=rand()%3+1;
+            b=a;
+            c=a;
+            glutPostRedisplay();
+        break;
 
-//Pobeda u drugoj igri, cheat key
-case  'm':
-    d=rand()%4+1;
-    e=d;
-    f=d;
-    g=d;
-    glutPostRedisplay();
-break;
+        //Pobeda u drugoj igri, cheat key
+        case  'm':
+            d=rand()%4+1;
+            e=d;
+            f=d;
+            g=d;
+            glutPostRedisplay();
+        break;
 
-//Restart igrice
-case 'r':
-    uzbuna=0;
-    broj_kredit=15;
-    broj_pobede=0;
-    broj_pokusaji=0;
-    glutPostRedisplay();
-break;    
-    }
+        //Restart igrice
+        case 'r':
+            uzbuna=0;
+            broj_kredit=15;
+            broj_pobede=0;
+            broj_pokusaji=0;
+            glutPostRedisplay();
+        break;    
+            }
 }
 
 static void on_reshape(int width, int height)
@@ -336,15 +322,17 @@ static void on_display(void)
     
     glViewport(0, 0, window_width, window_height);
     
+    
     //podesava se projekcija
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-1, 1, -1, 1, 1, 10);
+    gluPerspective(60, (float) window_width / window_height, 1, 10);
+    //glFrustum(-1, 1, -1, 1, 1, 10);
     
     //podesava se vidna tacka
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(Xeye, Yeye, Zeye,0,0,0,1,0,0); 
+    gluLookAt(Xeye, Yeye, Zeye, 0, 0, 0, 1, 0, 0); 
     
     
 //-----------------ELEMENTI-NA-SCENI----------------------------------------
@@ -423,7 +411,6 @@ static void on_display(void)
     
 //--------------------TEXT--------------------------------------------
     char pokusaji[MAX], kredit[MAX], pobede[MAX];
-    glColor3f(1,1,1);
     
     sprintf(pokusaji, "POKUSAJI: %d", broj_pokusaji);
     sprintf(kredit, "KREDIT: %d", broj_kredit);
@@ -835,7 +822,7 @@ static void on_display(void)
     glEnd();
         
     //ekran
-    glBindTexture(GL_TEXTURE_2D, names[2]);
+    glBindTexture(GL_TEXTURE_2D, names[1]);
     glBegin(GL_QUADS);
         glNormal3f(0, 0, 1);
 
@@ -852,6 +839,7 @@ static void on_display(void)
         glVertex3f(1.4, 0.5, 0.501);
     glEnd(); 
     glBindTexture(GL_TEXTURE_2D, 0);
+
     
     glutSwapBuffers();
 }
@@ -867,7 +855,7 @@ void on_timer(int value)
     glutPostRedisplay();
 
     if (timer_active)
-        glutTimerFunc(1, on_timer, 0);
+        glutTimerFunc(20, on_timer, 0);
 }
 //---------------------TIMER2-------------------------------------------------
 void on_timer2(int value)
@@ -901,10 +889,10 @@ void congrats(int i)
     if(i==1){
     vreme=0;
     
-    glutTimerFunc(500, on_timer, 0);
+    glutTimerFunc(150, on_timer, 0);
     timer_active=1;
     
-    for(int j=1; j<=150; j++){
+    for(int j=1; j<=100; j++){
         
         double rr=rand()%100, bb=rand()%100, gg=rand()%100;
         rr/=100;
@@ -949,10 +937,10 @@ void congrats(int i)
          
     vreme=0;
     
-    glutTimerFunc(500, on_timer, 0);
+    glutTimerFunc(100, on_timer, 0);
     timer_active=1;
     
-    for(int j=1; j<=150; j++){
+    for(int j=1; j<=100; j++){
         
         double rr=rand()%100, bb=rand()%100, gg=rand()%100;
         rr/=100;
@@ -995,8 +983,8 @@ void congrats(int i)
 }
 //------------------------------TEXT-------------------------------------------
 void drawString(float x, float y, float z, char *string) {
-  glRasterPos3f(x, y, z);
   glColor3f(1,1,1);
+  glRasterPos3f(x, y, z);
 
   for (char* cc = string; *cc != '\0'; cc++) {
     glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, *cc);

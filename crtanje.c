@@ -10,7 +10,7 @@
 void draw_button(double a, double b, double c)
 {
  glPushMatrix();
- glColor3f(1, 0, 0.4);
+ glColor3f(0.4, 0.4, 0.9);
  glTranslatef(a, b, c);
  glutSolidSphere(0.1, 50, 50);
  glPopMatrix();
@@ -124,7 +124,7 @@ void draw_diamond(void)
         glTranslatef(-0.4, -0.5, -0.5);
         glScalef(0.5, 0.5, 0.5);
         glBegin(GL_TRIANGLE_FAN);
-        glColor3f(0.2, 0.8, 1);
+        glColor3f(0, 0.8, 0.9);
         
         glVertex3f(1, 1, 1);
         glVertex3f(0.8, 1.2, 1.2);
@@ -136,7 +136,7 @@ void draw_diamond(void)
         
         
          glBegin(GL_TRIANGLE_FAN);
-         glColor3f(0, 0.8, 0.7);
+         glColor3f(0, 0.7, 1);
          glVertex3f(0.6, 1, 1);
          glVertex3f(0.8, 1.2, 1.2);
          glVertex3f(0.8, 0.8, 1.2);
@@ -148,12 +148,12 @@ void draw_diamond(void)
          glPopMatrix();
      
 }
-//---------------------ZELENA Kocka----------------------------------------
+//---------------------ZELENA-SFERA----------------------------------------
 void draw_green(void)
 {
     glPushMatrix();
     
-    glColor3f(0, 0.8, 0.4);
+    glColor3f(0.4, 1, 0.4);
     glutSolidSphere(0.1, 50, 50);
     
     glPopMatrix();
