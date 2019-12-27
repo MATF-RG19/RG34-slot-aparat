@@ -1,7 +1,7 @@
+# Slot aparat
 # RG34-slot-aparat
-Slot aparat
 
-### Pravila igre:
+### :memo: Pravila igre:
 * Igrica je napravljena kao modifikacija slot aparata.<br>
 * Igrica se sastoji od dve manje igrice koje se zasebno igraju. Prva igra
 ima tri elementa, a druga cetiri elementa.<br>
@@ -19,13 +19,13 @@ ljubicasto dugme, a druga kada kliknemo na desno ljubicasto dugme. <br>
 igru ili u vidu zvezdica za drugu igru.<br>
 * Gubimo kada ostanemo bez kredita. <br>
 
-### Komande:
+### :video_game: Komande:
 * Levo ljubicasto dugme pokrece prvu igru na klik misa.<br>
 * Desno ljubicasto dugme pokrece drugu igru na klik misa.<br>
 * Igricu restartujemo na taster 'r' ili 'R'.<br>
 * Izlazimo iz igrice na taster 'q' ili esc.<br>
 
-### Instalacija i pokretanje
+### :wrench: Instalacija i pokretanje
 * Projekat mozete preuzeti pomocu komande "git clone https://github.com/MATF-RG19/RG34-slot-aparat.git"<br>
 * Pozicionirati se u direktorijum RG34-slot-aparat<br>
 * Pokrenuti Makefile sa komandom "make"<br>
