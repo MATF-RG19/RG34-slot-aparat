@@ -22,7 +22,7 @@ igru ili u vidu zvezdica za drugu igru.<br>
 ### :video_game: Komande:
 * Levo ljubicasto dugme pokrece prvu igru na klik misa.<br>
 * Desno ljubicasto dugme pokrece drugu igru na klik misa.<br>
-* Igricu restartujemo na taster '<kbd>r</kbd> ili <kbd>R</kbd>.<br>
+* Igricu restartujemo na taster <kbd>r</kbd> ili <kbd>R</kbd>.<br>
 * Izlazimo iz igrice na taster <kbd>q</kbd> ili <kbd>esc</kbd>.<br>
 * Pogled kamere se moze pomerat na <kbd>a</kbd>, <kbd>s</kbd>, <kbd>d</kbd> i <kbd>w</kbd>, ali nije neophodno da bismo igrali igricu.
 
