@@ -1,5 +1,5 @@
 # Slot aparat
-# RG34-slot-aparat
+RG34-slot-aparat
 
 ### :memo: Pravila igre:
 * Igrica je napravljena kao modifikacija slot aparata.<br>
@@ -24,6 +24,7 @@ igru ili u vidu zvezdica za drugu igru.<br>
 * Desno ljubicasto dugme pokrece drugu igru na klik misa.<br>
 * Igricu restartujemo na taster 'r' ili 'R'.<br>
 * Izlazimo iz igrice na taster 'q' ili esc.<br>
+* Aparat se moze i rotirati na 'a', 's', 'd' i 'w', ali nije neophodno da bismo igrali igricu.
 
 ### :wrench: Instalacija i pokretanje
 * Projekat mozete preuzeti pomocu komande "git clone https://github.com/MATF-RG19/RG34-slot-aparat.git"<br>
