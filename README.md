@@ -15,7 +15,7 @@ pobedom u prvoj igrici kredit uvecava za 2 novcica, a pobedom u drugoj
 igrici se uvecava za 4 novcica.
 * Prva igrica se pokrece tako sto kliknemo levim tasterom misa na levo
 ljubicasto dugme, a druga kada kliknemo na desno ljubicasto dugme. <br>
-* Kada pobedimo sledi mala nagrada u vidu konfeta u obliku loptica za prvu
+* Kada pobedimo sledi nagrada u vidu konfeta u obliku loptica za prvu
 igru ili u vidu zvezdica za drugu igru.<br>
 * Gubimo kada ostanemo bez kredita. <br>
 
