@@ -19,13 +19,13 @@ ljubicasto dugme, a druga kada kliknemo na desno ljubicasto dugme.
 igru ili u vidu zvezdica za drugu igru.
 -Gubimo kada ostanemo bez kredita.
 
-#Komande:
+# Komande:
 -Levo ljubicasto dugme pokrece prvu igru na klik misa.
 -Desno ljubicasto dugme pokrece drugu igru na klik misa.
 -Igricu restartujemo na taster 'r' ili 'R'.
 -Izlazimo iz igrice na taster 'q' ili esc.
 
-#Instalacija i pokretanje
+# Instalacija i pokretanje
 -Projekat mozete preuzeti pomocu komande "git clone https://github.com/MATF-RG19/RG34-slot-aparat.git"
 -Pozicionirati se u direktorijum RG34-slot-aparat
 -Pokrenuti Makefile sa komandom "make"
