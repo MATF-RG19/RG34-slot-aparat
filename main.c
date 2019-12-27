@@ -17,24 +17,28 @@
 #include "kordinatni.h"
 #include "crtanje.h"
 #include "osvetljenje.h"
+#include "teksture.h"
+#include "igrice.h"
 
 static void on_display(void);
 static void on_reshape(int width,int height);
 static void on_keyboard(unsigned char key, int x, int y);
 static void congrats(int i);
-static void on_timer(int value);
 static void on_mouse(int button, int state, int x, int y);
+static void on_timer(int value);
 static void on_timer2(int value);
 static void on_timer3(int value);
 void drawString(float x, float y, float z, char *string) ;
 static void initialize(void);
+void tekst(void);
+
 
 float Xeye=0.7, Yeye=0, Zeye=4.2;
 int a=0, b=0, c=0, d=0, e=0, f=0, g=0;
 
 static int window_width, window_height;
-static float vreme;
-static int timer_active, timer_active2, timer_active3;
+static int vreme=0;
+static int timer_active=0, timer_active2=0, timer_active3=0;
 static int broj_kredit=15, broj_pobede=0, broj_pokusaji=0;
 static int uzbuna=0;
 double alfa=0, beta=0;
@@ -59,7 +63,7 @@ int main(int argc, char **argv)
 
     glClearColor(0.6, 0.6, 1, 0);
     glEnable(GL_DEPTH_TEST);
-    glLineWidth(2);
+    glEnable(GL_NORMALIZE);
     
     srand(time(NULL));
     initialize();
@@ -68,6 +72,43 @@ int main(int argc, char **argv)
 
     return 0;
 }
+
+static void on_display(void)
+{
+    setting_light();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glViewport(0, 0, window_width, window_height);
+    
+    //podesava se projekcija
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60, (float) window_width / window_height, 1, 10);
+    
+    //podesava se vidna tacka
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(Xeye, Yeye, Zeye, 0, 0, 0, 1, 0, 0); 
+  
+    elementi_scene();
+    tekst();
+
+    prva_igra(a, b, c, alfa);
+    if(a==b && b==c && a!=0){
+         congrats(1);}
+         
+    druga_igra(d, e, f, g, beta);
+      if(d==e && e==f && f==g && d!=0){
+         congrats(2);}
+    
+    teksture(names);
+    
+    
+    glutPostRedisplay();
+    glutSwapBuffers();
+}
+
+//----------------------------TEKSTURE-----------------------------------
 static void initialize(void)
 {
     /* Objekat koji predstavlja teskturu ucitanu iz fajla. */
@@ -80,10 +121,8 @@ static void initialize(void)
               GL_TEXTURE_ENV_MODE,
               GL_REPLACE);
 
-    /*
-     * Inicijalizuje se objekat koji ce sadrzati teksture ucitane iz
-     * fajla.
-     */
+    /*Inicijalizuje se objekat koji ce sadrzati teksture ucitane iz
+     * fajla.*/
     image = image_init(0, 0);
 
     /* Kreira se prva tekstura. */
@@ -105,7 +144,6 @@ static void initialize(void)
                  image->width, image->height, 0,
                  GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 
-   
     /* Kreira se druga tekstura. */
     image_read(image, FILENAME1);
  
@@ -127,9 +165,7 @@ static void initialize(void)
 
     /* Unistava se objekat za citanje tekstura iz fajla. */
     image_done(image);
-
 }
-
 
 static void on_mouse(int button, int state, int x, int y)
 {
@@ -154,8 +190,6 @@ static void on_mouse(int button, int state, int x, int y)
     
     double rezs[3];
     double reze[3];
-    
-    
     
     gluUnProject(winX, winY, 1.0, modelview, projection, 
              viewport, &reze[0], &reze[1], &reze[2]); 
@@ -184,9 +218,7 @@ static void on_mouse(int button, int state, int x, int y)
                   (reze[1]-rezs[1])*(rezs[1]-c2y)+
                   (reze[2]-rezs[2])*(rezs[2]-c2z))/
                   norma_vektor_prave;
-                  
-                  
-    //rezs + vektor_prave*korak1
+
     double N1[3], N2[3];
     
     N1[0]=rezs[0] + vektor_prave[0]/norma_vektor_prave*korak1;
@@ -204,7 +236,9 @@ static void on_mouse(int button, int state, int x, int y)
 
     //Proveravamo da li je kliknuto na prvo dugme
     if(distance1<=0.1 && uzbuna==0)
-    {
+    {   
+        timer_active=0;
+        
         a=rand()%3+1;
         b=rand()%3+1;
         c=rand()%3+1;
@@ -216,18 +250,22 @@ static void on_mouse(int button, int state, int x, int y)
         broj_kredit--;
         if(a==b && b==c && a!=0){
             broj_pobede++;
-            broj_kredit=broj_kredit+2;}
+            broj_kredit=broj_kredit+2;
+            timer_active=1;
+            vreme=0;
+        }
             
-        glutPostRedisplay();
         timer_active2=0;
         alfa=0;
         
         glutPostRedisplay();
     }
     
-    //Proveravamo da li je kliknuto na drugi dugme
+    //Proveravamo da li je kliknuto na drugo dugme
     else if(distance2<=0.1 && uzbuna==0 && broj_kredit>=2)
     {
+        timer_active=0;
+        
         d=rand()%4+1;
         e=rand()%4+1;
         f=rand()%4+1;
@@ -240,9 +278,11 @@ static void on_mouse(int button, int state, int x, int y)
         broj_kredit=broj_kredit-2;
         if(d==e && e==f && f==g && d!=0){
             broj_pobede++;
-            broj_kredit=broj_kredit+4;}
+            broj_kredit=broj_kredit+4;
+            timer_active=1;
+            vreme=0;
+        }
             
-        glutPostRedisplay();
         timer_active3=0;
         beta=0;
         
@@ -256,28 +296,33 @@ void on_keyboard(unsigned char key, int x, int y)
         switch (key){
             
         case 'q':
-        /* Zavrsava se program. */
-        exit(0);
+        case 27:
+            /* Zavrsava se program. */
+            exit(0);
         break;
 
         case 's':
-        Zeye += 0.1;
-        glutPostRedisplay();
+        case 'S':
+            Zeye += 0.1;
+            glutPostRedisplay();
         break;
 
         case 'w':
-        Zeye -= 0.1;
-        glutPostRedisplay();
+        case 'W':
+            Zeye -= 0.1;
+            glutPostRedisplay();
         break;
 
         case 'a':
-        Xeye -= 0.1;
-        glutPostRedisplay();
+        case 'A':
+            Xeye -= 0.1;
+            glutPostRedisplay();
         break;
 
         case 'd':
-        Xeye += 0.1;
-        glutPostRedisplay();
+        case 'D':
+            Xeye += 0.1;
+            glutPostRedisplay();
         break;
 
         //Pobeda u prvoj igri, cheat key
@@ -285,6 +330,7 @@ void on_keyboard(unsigned char key, int x, int y)
             a=rand()%3+1;
             b=a;
             c=a;
+            timer_active=1;
             glutPostRedisplay();
         break;
 
@@ -294,11 +340,13 @@ void on_keyboard(unsigned char key, int x, int y)
             e=d;
             f=d;
             g=d;
+            timer_active=1;
             glutPostRedisplay();
         break;
 
         //Restart igrice
         case 'r':
+        case 'R':
             uzbuna=0;
             broj_kredit=15;
             broj_pobede=0;
@@ -310,552 +358,19 @@ void on_keyboard(unsigned char key, int x, int y)
 
 static void on_reshape(int width, int height)
 {
-    /* Pamte se sirina i visina prozora. */
     window_width = width;
     window_height = height;
 }
-
-static void on_display(void)
-{
-    setting_light();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    glViewport(0, 0, window_width, window_height);
-    
-    
-    //podesava se projekcija
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60, (float) window_width / window_height, 1, 10);
-    //glFrustum(-1, 1, -1, 1, 1, 10);
-    
-    //podesava se vidna tacka
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(Xeye, Yeye, Zeye, 0, 0, 0, 1, 0, 0); 
-    
-    
-//-----------------ELEMENTI-NA-SCENI----------------------------------------
-    
-    //draw_coordinate_lines();
-    
-    //kocka prva
-    glPushMatrix();
-        glScalef(1.4, 0.5, 0.5);
-        glColor3f(0, 0.3, 0.7);
-        glutSolidCube(2);
-     glPopMatrix();
-    
-     //kocka druga
-     glPushMatrix();
-        glScalef(0.5, 0.5, 0.5);
-        glColor3f(0, 0.3, 0.7);
-        glTranslatef(-1.8,0,2);
-        glutSolidCube(2);
-     glPopMatrix();
-     
-    //trouglasta prizma
-      glPushMatrix();
-          glTranslatef(0.1,0,0.5);
-          glRotatef(90, 0, 1, 0);
-          glRotatef(90, 0, 0, 1);
-          glColor3f(0, 0.3, 0.7);
-
-    glBegin(GL_QUADS);
-        glVertex3f(0.5, 0, 0.5);
-        glVertex3f(0.5, 0, -0.5);
-        glVertex3f(-0.5, 0, -0.5);
-        glVertex3f(-0.5, 0, 0.5);
-
-        glVertex3f(0.5,0,-0.5);
-        glVertex3f(0.5,1,-0.5);
-        glVertex3f(-0.5,1,-0.5);
-        glVertex3f(-0.5,0,-0.5);
-        
-        //gornja konzola
-        glColor3f(0,0,0.4);
-        glVertex3f(0.45, 0.5, 0.02);
-        glVertex3f(-0.45, 0.5, 0.02);
-        glVertex3f(-0.45,0,0.52);
-        glVertex3f(0.45,0,0.52);
-        
-        
-         //donja kozola
-         glColor3f(0,0,0.4);
-         glVertex3f(0.45, 1, -0.51);
-         glVertex3f(-0.45, 1, -0.51);
-         glVertex3f(-0.45, 0.55, 0.02);
-         glVertex3f(0.45,0.55, 0.02);
-        
-        glColor3f(0, 0.3, 0.7);
-        glVertex3f(0.5,1,-0.5);
-        glVertex3f(-0.5,1,-0.5);
-        glVertex3f(-0.5,0,0.5);
-        glVertex3f(0.5,0,0.5);
-    glEnd();
-    
-    glBegin(GL_TRIANGLES);
-        glColor3f(0, 0.8,0.9);
-        glVertex3f(0.5,0,0.5);
-        glVertex3f(0.5,1,-0.5);
-        glVertex3f(0.5,0,-0.5);
-
-        glVertex3f(-0.5,0,0.5);
-        glVertex3f(-0.5,1,-0.5);
-        glVertex3f(-0.5,0,-0.5);
-    glEnd();
-    glPopMatrix();
-    
-    draw_button(-0.6, 0.3, 1.5);
-    draw_button(-0.6, -0.3, 1.5);
-    
-//--------------------TEXT--------------------------------------------
-    char pokusaji[MAX], kredit[MAX], pobede[MAX];
-    
-    sprintf(pokusaji, "POKUSAJI: %d", broj_pokusaji);
-    sprintf(kredit, "KREDIT: %d", broj_kredit);
-    sprintf(pobede, "POBEDE: %d", broj_pobede);
-    
-    if(broj_kredit<=0){
-        drawString(1.2, 0.3, 0.52, "Nemate dovoljno");
-        drawString(1.1, 0.3, 0.52, "kredita");
-        drawString(1, 0.3, 0.52, pobede);
-        drawString(0.8, 0.3, 0.52, "Pritisnite 'r'");
-        uzbuna=1;
-     }
-     
-    else{
-        drawString(1.2, 0.3, 0.52, pokusaji);
-        drawString(1, 0.3, 0.52, kredit);
-        drawString(0.8, 0.3, 0.52, pobede);
-     }
-     
-//-------------------------PRVA-IGRA----------------------------------
-    //stanje na pocetku
-    if(a==0 && b==0 && c==0){
-    glPushMatrix();
-    glRotatef(2, 0, 1, 0);
-    glTranslatef(0.45, 0.28, 0.9);
-    draw_element_fire();
-    glPopMatrix();
-    
-    glPushMatrix();
-    glRotatef(2, 0, 1, 0);
-    glTranslatef(0.45, 0, 0.9);
-    draw_diamond();
-    glPopMatrix();
-    
-    glPushMatrix();
-    glRotatef(2, 0, 1, 0);
-    glTranslatef(0.45, -0.28, 0.9);
-    draw_green();
-    glPopMatrix();}
-    
-    //stanje kada se odigra prva igra
-    glPushMatrix();
-    glRotatef(alfa, 0, 1, 0);
-    
-    switch (a){
-
-    case 1:
-    glPushMatrix();
-    glTranslatef(0.45, 0.28, 0.9);
-    draw_element_fire();
-    glPopMatrix();
-    break;
-    
-    case 2:
-    glPushMatrix();
-    glTranslatef(0.45, 0.28, 0.9);
-    draw_diamond();
-    glPopMatrix();
-    break;
-    
-    case 3:
-    glPushMatrix();
-    glTranslatef(0.45, 0.28, 0.9);
-    draw_green();
-    glPopMatrix();
-    break;
-    }
-    
-    switch (b){
-
-    case 1:
-    glPushMatrix();
-    glTranslatef(0.45, 0, 0.9);
-    draw_element_fire();
-    glPopMatrix();
-    break;
-    
-    case 2:
-    glPushMatrix();
-    glTranslatef(0.45, 0, 0.9);
-    draw_diamond();
-    glPopMatrix();
-    break;
-    
-    case 3:
-    glPushMatrix();
-    glTranslatef(0.45, 0, 0.9);
-    draw_green();
-    glPopMatrix();
-    break;
-    }
-    
-    switch (c){
-
-    case 1:
-    glPushMatrix();
-    glTranslatef(0.45, -0.28, 0.9);
-    draw_element_fire();
-    glPopMatrix();
-    break;
-    
-    case 2:
-    glPushMatrix();
-    glTranslatef(0.45, -0.28, 0.9);
-    draw_diamond();
-    glPopMatrix();
-    break;
-    
-    case 3:
-    glPushMatrix();
-    glTranslatef(0.45, -0.28, 0.9);
-    draw_green();
-    glPopMatrix();
-    break;
-    }
-    glPopMatrix();
-    
-    if(a==b && b==c && a!=0){
-        congrats(1);
-    }
-//-------------------------DRUGA-IGRA-----------------------------------------
-    //stanje na pocetku
-    if(d==0 && e==0 && f==0 && g==0){
-    glPushMatrix();
-    glRotatef(2, 0, 1, 0);
-    glTranslatef(-0.1, 0.3, 1.4);
-    glColor3f(0.6, 0.3, 0.9);
-    glutSolidSphere(0.1, 50, 50); 
-    glPopMatrix();
-    
-    glPushMatrix();
-    glRotatef(2, 0, 1, 0);
-    glTranslatef(-0.1, 0.1, 1.4);
-    glColor3f(0, 0.8, 0.2);
-    glutSolidSphere(0.1, 50, 50);   
-    glPopMatrix();
-    
-    glPushMatrix();
-    glRotatef(2, 0, 1, 0);
-    glTranslatef(-0.1, -0.1, 1.4);
-    glColor3f(0.9, 0.2, 0.8);
-    glutSolidSphere(0.1, 50, 50);   
-    glPopMatrix();
-    
-    glPushMatrix();
-    glRotatef(2, 0, 1, 0);
-    glTranslatef(-0.1, -0.3, 1.4);
-    glColor3f(1, 0.7, 0.1);
-    glutSolidSphere(0.1, 50, 50);
-    glPopMatrix();
-    }
-    
-    //stanje kada se odigra druga igra
-    glPushMatrix();
-    glRotatef(beta, 0, 1, 0);
-    
-    switch (d){
-        case 1:
-        glPushMatrix();
-        glTranslatef(-0.1, 0.3, 1.4);
-        glColor3f(0.6, 0.3, 0.9);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 2:
-        glPushMatrix();
-        glTranslatef(-0.1, 0.3, 1.4);
-        glColor3f(0, 0.8, 0.2);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 3:
-        glPushMatrix();
-        glTranslatef(-0.1, 0.3, 1.4);
-        glColor3f(0.9, 0.2, 0.8);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 4:
-        glPushMatrix();
-        glTranslatef(-0.1, 0.3, 1.4);
-        glColor3f(1, 0.7, 0.1);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-    }
-    
-    switch (e){
-        case 1:
-        glPushMatrix();
-        glTranslatef(-0.1, 0.1, 1.4);
-        glColor3f(0.6, 0.3, 0.9);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 2:
-        glPushMatrix();
-        glTranslatef(-0.1, 0.1, 1.4);
-        glColor3f(0, 0.8, 0.2);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 3:
-        glPushMatrix();
-        glTranslatef(-0.1, 0.1, 1.4);
-        glColor3f(0.9, 0.2, 0.8);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 4:
-        glPushMatrix();
-        glTranslatef(-0.1, 0.1, 1.4);
-        glColor3f(1, 0.7, 0.1);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-    }
-    
-    switch (f){
-        case 1:
-        glPushMatrix();
-        glTranslatef(-0.1, -0.1, 1.4);
-        glColor3f(0.6, 0.3, 0.9);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 2:
-        glPushMatrix();
-        glTranslatef(-0.1, -0.1, 1.4);
-        glColor3f(0, 0.8, 0.2);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 3:
-        glPushMatrix();
-        glTranslatef(-0.1, -0.1, 1.4);
-        glColor3f(0.9, 0.2, 0.8);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 4:
-        glPushMatrix();
-        glTranslatef(-0.1, -0.1, 1.4);
-        glColor3f(1, 0.7, 0.1);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-    }
-    switch (g){
-        case 1:
-        glPushMatrix();
-        glTranslatef(-0.1, -0.3, 1.4);
-        glColor3f(0.6, 0.3, 0.9);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 2:
-        glPushMatrix();
-        glTranslatef(-0.1, -0.3, 1.4);
-        glColor3f(0, 0.8, 0.2);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 3:
-        glPushMatrix();
-        glTranslatef(-0.1, -0.3, 1.4);
-        glColor3f(0.9, 0.2, 0.8);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-        case 4:
-        glPushMatrix();
-        glTranslatef(-0.1, -0.3, 1.4);
-        glColor3f(1, 0.7, 0.1);
-        glutSolidSphere(0.1, 50, 50); 
-        glPopMatrix();
-            break;
-    } 
-    glPopMatrix();
-    
-    if(d==e && e==f && f==g && d!=0){
-        congrats(2);
-    }
-//---------------------------TEKSTURE--------------------------------------------
-    //front
-    glBindTexture(GL_TEXTURE_2D, names[0]);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(-1.4, -0.5, 1.501);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(-0.39, -0.5, 1.501);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(-0.39, 0.5, 1.501);
-
-        glTexCoord2f(0, 1);
-        glVertex3f(-1.4, 0.5, 1.501);
-    glEnd();
-    
-    //back
-    glBindTexture(GL_TEXTURE_2D, names[0]);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(-1.4, -0.5, -0.501);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(1.4, -0.5, -0.501);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(1.4, 0.5, -0.501);
-
-        glTexCoord2f(0, 1);
-        glVertex3f(-1.4, 0.5, -0.501);
-    glEnd();
-    
-    //top
-    glBindTexture(GL_TEXTURE_2D, names[0]);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(1.401, -0.5, -0.5);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(1.401, -0.5, 0.5);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(1.401, 0.5, 0.5);
-
-        glTexCoord2f(0, 1);
-        glVertex3f(1.401, 0.5, -0.5);
-    glEnd();
-    
-    //bottom
-      glBindTexture(GL_TEXTURE_2D, names[0]);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(-1.401, 0.5, -0.5);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(-1.401, 0.5, 1.5);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(-1.401, -0.5, 1.5);
-
-        glTexCoord2f(0, 1);
-        glVertex3f(-1.401, -0.5, -0.5);
-    glEnd();
-    
-    //front top
-      glBindTexture(GL_TEXTURE_2D, names[0]);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(0.6, -0.5, 0.5);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(-0.39, -0.5, 1.5);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(-0.39, 0.5, 1.5);
-
-        glTexCoord2f(0, 1);
-        glVertex3f(0.6, 0.5, 0.5);
-    glEnd();
-    
-    //konzola gornja
-    glBindTexture(GL_TEXTURE_2D, names[1]);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(0.62, -0.5, 0.5);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(0.13, -0.5, 1);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(0.13, 0.5, 1);
-
-        glTexCoord2f(0, 1);
-        glVertex3f(0.62, 0.5, 0.5);
-    glEnd();
-    
-    //konzola donja
-    glBindTexture(GL_TEXTURE_2D, names[1]);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(0.12, -0.5, 1.05);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(-0.34, -0.5, 1.45);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(-0.34, 0.5, 1.45);
-
-        glTexCoord2f(0, 1);
-        glVertex3f(0.12, 0.5, 1.05);
-    glEnd();
-        
-    //ekran
-    glBindTexture(GL_TEXTURE_2D, names[1]);
-    glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(1.4, -0.5, 0.501);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(0.6, -0.5, 0.501);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(0.6, 0.5, 0.501);
-
-        glTexCoord2f(0, 1);
-        glVertex3f(1.4, 0.5, 0.501);
-    glEnd(); 
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    
-    glutSwapBuffers();
-}
-
 //---------------------TIMER1-------------------------------------------------
 void on_timer(int value)
 {
-    if (value != 0)
-        return;
-
-    vreme+=0.1;
-
-    glutPostRedisplay();
-
-    if (timer_active)
-        glutTimerFunc(20, on_timer, 0);
+    if (value == 0){
+        vreme+=1;
+        glutPostRedisplay();
+    }
+    
+    if(timer_active)
+        glutTimerFunc(10, on_timer, 0);
 }
 //---------------------TIMER2-------------------------------------------------
 void on_timer2(int value)
@@ -885,103 +400,14 @@ void on_timer3(int value)
 }
 //-------------------CONGRATS---------------------------------------------
 void congrats(int i)
-{
-    if(i==1){
-    vreme=0;
-    
-    glutTimerFunc(150, on_timer, 0);
-    timer_active=1;
-    
-    for(int j=1; j<=100; j++){
-        
-        double rr=rand()%100, bb=rand()%100, gg=rand()%100;
-        rr/=100;
-        bb/=100;
-        gg/=100;
-        
-        glPushMatrix();
-        glColor3f(rr, bb, gg);
-        glTranslatef(rr+0.5+vreme, bb+0.5+vreme, gg+vreme);
-        glutSolidSphere(0.04, 50, 50);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr+0.5+vreme, bb-1.5+vreme, gg+vreme);
-        glutSolidSphere(0.04, 50, 50);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr-0.5+vreme, bb+0.5+vreme, gg+vreme);
-        glutSolidSphere(0.04, 50, 50);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr-0.5+vreme, bb-1.5+vreme, gg+vreme);
-        glutSolidSphere(0.04, 50, 50);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr-1.5+vreme, bb+0.5+vreme, gg+vreme);
-        glutSolidSphere(0.04, 50, 50);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr-1.5+vreme, bb-1.5+vreme, gg+vreme);
-        glutSolidSphere(0.04, 50, 50);
-        glPopMatrix();
+{ 
+    glutTimerFunc(10, on_timer, 0);
      
-     }
-     timer_active=0;
-    } 
-     else if(i==2){
-         
-    vreme=0;
-    
-    glutTimerFunc(100, on_timer, 0);
-    timer_active=1;
-    
-    for(int j=1; j<=100; j++){
-        
-        double rr=rand()%100, bb=rand()%100, gg=rand()%100;
-        rr/=100;
-        bb/=100;
-        gg/=100;
-        
-        glPushMatrix();
-        glColor3f(rr, bb, gg);
-        glTranslatef(rr+0.5+vreme, bb+0.5+vreme, gg+vreme);
-        draw_star(rr, bb, gg);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr+0.5+vreme, bb-1.5+vreme, gg+vreme);
-        draw_star(rr, bb, gg);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr-0.5+vreme, bb+0.5+vreme, gg+vreme);
-        draw_star(rr, bb, gg);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr-0.5+vreme, bb-1.5+vreme, gg+vreme);
-        draw_star(rr, bb, gg);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr-1.5+vreme, bb+0.5+vreme, gg+vreme);
-        draw_star(rr, bb, gg);
-        glPopMatrix();
-        
-        glPushMatrix();
-        glTranslatef(rr-1.5+vreme, bb-1.5+vreme, gg+vreme);
-        draw_star(rr, bb, gg);
-        glPopMatrix();
-     }
-     timer_active=0;
+    if(timer_active){
+        konfete(vreme, i);
     }
 }
-//------------------------------TEXT-------------------------------------------
+//--------------------------TEXT-POSTAVKA---------------------------------------
 void drawString(float x, float y, float z, char *string) {
   glColor3f(1,1,1);
   glRasterPos3f(x, y, z);
@@ -991,8 +417,25 @@ void drawString(float x, float y, float z, char *string) {
   }
 }
 
-
-
-
-
-
+//------------------------------TEXT--------------------------------------------
+void tekst(void){
+    char pokusaji[MAX], kredit[MAX], pobede[MAX];
+    
+    sprintf(pokusaji, "POKUSAJI: %d", broj_pokusaji);
+    sprintf(kredit, "KREDIT: %d", broj_kredit);
+    sprintf(pobede, "POBEDE: %d", broj_pobede);
+    
+    if(broj_kredit<=0){
+        drawString(1.2, 0.3, 0.52, "Nemate dovoljno");
+        drawString(1.1, 0.3, 0.52, "kredita");
+        drawString(1, 0.3, 0.52, pobede);
+        drawString(0.8, 0.3, 0.52, "Pritisnite 'r'");
+        uzbuna=1;
+     }
+     
+    else{
+        drawString(1.2, 0.3, 0.52, pokusaji);
+        drawString(1, 0.3, 0.52, kredit);
+        drawString(0.8, 0.3, 0.52, pobede);
+     }
+}

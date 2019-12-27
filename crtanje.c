@@ -158,3 +158,78 @@ void draw_green(void)
     
     glPopMatrix();
 }
+//-----------------ELEMENTI-NA-SCENI----------------------------------------
+    
+void elementi_scene(void){
+    //draw_coordinate_lines();
+    
+    //kocka prva
+    glPushMatrix();
+        glScalef(1.4, 0.5, 0.5);
+        glColor3f(0, 0.3, 0.7);
+        glutSolidCube(2);
+     glPopMatrix();
+    
+     //kocka druga
+     glPushMatrix();
+        glScalef(0.5, 0.5, 0.5);
+        glColor3f(0, 0.3, 0.7);
+        glTranslatef(-1.8,0,2);
+        glutSolidCube(2);
+     glPopMatrix();
+     
+    //trouglasta prizma
+      glPushMatrix();
+          glTranslatef(0.1,0,0.5);
+          glRotatef(90, 0, 1, 0);
+          glRotatef(90, 0, 0, 1);
+          glColor3f(0, 0.3, 0.7);
+
+    glBegin(GL_QUADS);
+        glVertex3f(0.5, 0, 0.5);
+        glVertex3f(0.5, 0, -0.5);
+        glVertex3f(-0.5, 0, -0.5);
+        glVertex3f(-0.5, 0, 0.5);
+
+        glVertex3f(0.5,0,-0.5);
+        glVertex3f(0.5,1,-0.5);
+        glVertex3f(-0.5,1,-0.5);
+        glVertex3f(-0.5,0,-0.5);
+        
+        //gornja konzola
+        glColor3f(0,0,0.4);
+        glVertex3f(0.45, 0.5, 0.02);
+        glVertex3f(-0.45, 0.5, 0.02);
+        glVertex3f(-0.45,0,0.52);
+        glVertex3f(0.45,0,0.52);
+        
+        
+         //donja kozola
+         glColor3f(0,0,0.4);
+         glVertex3f(0.45, 1, -0.51);
+         glVertex3f(-0.45, 1, -0.51);
+         glVertex3f(-0.45, 0.55, 0.02);
+         glVertex3f(0.45,0.55, 0.02);
+        
+        glColor3f(0, 0.3, 0.7);
+        glVertex3f(0.5,1,-0.5);
+        glVertex3f(-0.5,1,-0.5);
+        glVertex3f(-0.5,0,0.5);
+        glVertex3f(0.5,0,0.5);
+    glEnd();
+    
+    glBegin(GL_TRIANGLES);
+        glColor3f(0, 0.8,0.9);
+        glVertex3f(0.5,0,0.5);
+        glVertex3f(0.5,1,-0.5);
+        glVertex3f(0.5,0,-0.5);
+
+        glVertex3f(-0.5,0,0.5);
+        glVertex3f(-0.5,1,-0.5);
+        glVertex3f(-0.5,0,-0.5);
+    glEnd();
+    glPopMatrix();
+    
+    draw_button(-0.6, 0.3, 1.5);
+    draw_button(-0.6, -0.3, 1.5);
+}

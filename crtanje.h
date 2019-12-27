@@ -6,5 +6,6 @@ void draw_element_fire();
 void draw_diamond(void);
 void draw_green(void);
 void draw_star(double boja1, double boja2, double boja3);
+void elementi_scene(void);
 
 #endif
