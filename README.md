@@ -22,9 +22,9 @@ igru ili u vidu zvezdica za drugu igru.<br>
 ### :video_game: Komande:
 * Levo ljubicasto dugme pokrece prvu igru na klik misa.<br>
 * Desno ljubicasto dugme pokrece drugu igru na klik misa.<br>
-* Igricu restartujemo na taster 'r' ili 'R'.<br>
-* Izlazimo iz igrice na taster 'q' ili esc.<br>
-* Aparat se moze i rotirati na 'a', 's', 'd' i 'w', ali nije neophodno da bismo igrali igricu.
+* Igricu restartujemo na taster '<kbd>r</kbd> ili <kbd>R</kbd>.<br>
+* Izlazimo iz igrice na taster <kbd>q</kbd> ili <kbd>esc</kbd>.<br>
+* Pogled kamere se moze pomerat na <kbd>a</kbd>, <kbd>s</kbd>, <kbd>d</kbd> i <kbd>w</kbd>, ali nije neophodno da bismo igrali igricu.
 
 ### :wrench: Instalacija i pokretanje
 * Projekat mozete preuzeti pomocu komande "git clone https://github.com/MATF-RG19/RG34-slot-aparat.git"<br>
