@@ -23,11 +23,11 @@ igru ili u vidu zvezdica za drugu igru.<br>
 * Levo ljubicasto dugme pokrece prvu igru na klik misa.<br>
 * Desno ljubicasto dugme pokrece drugu igru na klik misa.<br>
 * Igricu restartujemo na taster <kbd>r</kbd> ili <kbd>R</kbd>.<br>
-* Izlazimo iz igrice na taster <kbd>q</kbd> ili <kbd>esc</kbd>.<br>
+* Izlazimo iz igrice na taster <kbd>q</kbd>,  <kbd>Q</kbd> ili <kbd>esc</kbd>.<br>
 * Pogled kamere se moze pomerat na <kbd>a</kbd>, <kbd>s</kbd>, <kbd>d</kbd> i <kbd>w</kbd>, ali nije neophodno da bismo igrali igricu.
 
 ### :wrench: Instalacija i pokretanje
 * Projekat mozete preuzeti pomocu komande "git clone https://github.com/MATF-RG19/RG34-slot-aparat.git"<br>
-* Pozicionirati se u direktorijum RG34-slot-aparat<br>
+* Pozicionirati se u direktorijum RG34-slot-aparat/Sources<br>
 * Pokrenuti Makefile sa komandom "make"<br>
-* Pokrenuti sa komandom "./01"<br>
+* Pokrenuti sa komandom "./slot"<br>
