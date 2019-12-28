@@ -1,4 +1,4 @@
-PROGRAM   = 01
+PROGRAM   = slot
 CC        = gcc
 CFLAGS    = -g -Wall
 LDFLAGS   = -lGL -lGLU -lglut

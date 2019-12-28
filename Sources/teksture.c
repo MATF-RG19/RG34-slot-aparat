@@ -1,12 +1,11 @@
 #include <stdlib.h>
 #include <GL/glut.h>
-#include <time.h>
 #include <stdio.h>
 #include <math.h>
 #include <unistd.h>
 #include <string.h>
 
-#include "teksture.h"
+#include "../Headers/teksture.h"
 
 //---------------------------TEKSTURE--------------------------------------------
 void teksture(GLuint* names){

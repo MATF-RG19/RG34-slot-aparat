@@ -2,6 +2,8 @@
 #include <GL/glut.h>
 #include <stdio.h>
 
+#include "../Headers/osvetljenje.h"
+
 void setting_light(){
     glShadeModel(GL_SMOOTH);
     

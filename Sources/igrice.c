@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include <string.h>
 
-#include "igrice.h"
-#include "crtanje.h"
+#include "../Headers/igrice.h"
+#include "../Headers/crtanje.h"
 
 
 //----------------------------PRVA-------------------------------------------

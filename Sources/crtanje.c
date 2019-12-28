@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "../Headers/crtanje.h"
+
 //---------------------DUGME-------------------------------------------------
 void draw_button(double a, double b, double c)
 {

@@ -2,6 +2,8 @@
 #include <GL/glut.h>
 #include <stdio.h>
 
+#include "../Headers/kordinatni.h"
+
 void draw_coordinate_lines(void)
 {
        glColor3f(1.0,0.0,0.0); // red x

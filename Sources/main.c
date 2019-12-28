@@ -5,20 +5,20 @@
 #include <math.h>
 #include <unistd.h>
 #include <string.h>
-#include "image.h"
+#include "../Headers/image.h"
 
 #define MAX 1000
 #define PI 3.14
 
-#define FILENAME0 "plava_pozadina.bmp"
-#define FILENAME1 "ekran.bmp"
+#define FILENAME0 "../Teksture/plava_pozadina.bmp"
+#define FILENAME1 "../Teksture/ekran.bmp"
 
 
-#include "kordinatni.h"
-#include "crtanje.h"
-#include "osvetljenje.h"
-#include "teksture.h"
-#include "igrice.h"
+#include "../Headers/kordinatni.h"
+#include "../Headers/crtanje.h"
+#include "../Headers/osvetljenje.h"
+#include "../Headers/teksture.h"
+#include "../Headers/igrice.h"
 
 static void on_display(void);
 static void on_reshape(int width,int height);
@@ -296,6 +296,7 @@ void on_keyboard(unsigned char key, int x, int y)
         switch (key){
             
         case 'q':
+        case 'Q':
         case 27:
             /* Zavrsava se program. */
             exit(0);
