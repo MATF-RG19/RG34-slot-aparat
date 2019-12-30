@@ -12,6 +12,7 @@
 
 //----------------------------PRVA-------------------------------------------
 void prva_igra(int a, int b, int c, double alfa){
+    //pocetno stanje
 if(a==0 && b==0 && c==0){
     glPushMatrix();
     glRotatef(2, 0, 1, 0);
@@ -107,12 +108,11 @@ if(a==0 && b==0 && c==0){
     break;
     }
     glPopMatrix();
-    
 }
 
 //-------------------------DRUGA-IGRA-----------------------------------------
 void druga_igra(int d, int e, int f, int g, double beta){
-    //stanje na pocetku
+    //pocetno stanje
     if(d==0 && e==0 && f==0 && g==0){
     glPushMatrix();
     glRotatef(2, 0, 1, 0);
@@ -275,8 +275,10 @@ void druga_igra(int d, int e, int f, int g, double beta){
 //---------------------------------KONFETE-----------------------------------
  void konfete(int vreme, int i){
      
+    //vrednost koju menja fja on_timer
     vreme=(vreme%1000)/1000;
     
+    //iscrtavamo 100 konfeti
     for(int j=1; j<=100; j++){
         double rr=rand()%100, bb=rand()%100, gg=rand()%100;
         rr/=100;

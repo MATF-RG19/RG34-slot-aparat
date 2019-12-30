@@ -32,8 +32,9 @@ void drawString(float x, float y, float z, char *string) ;
 static void initialize(void);
 void tekst(void);
 
-
+//parametri kamere
 float Xeye=0.7, Yeye=0, Zeye=4.2;
+//parametri elemenata koji se menjaju
 int a=0, b=0, c=0, d=0, e=0, f=0, g=0;
 
 static int window_width, window_height;
@@ -43,6 +44,7 @@ static int broj_kredit=15, broj_pobede=0, broj_pokusaji=0;
 static int uzbuna=0;
 double alfa=0, beta=0;
 
+//niz za teksture
 static GLuint names[2];
 
 
@@ -191,6 +193,7 @@ static void on_mouse(int button, int state, int x, int y)
     double rezs[3];
     double reze[3];
     
+    //trazimo 3D kordinate i stavljamo ih u niz reze
     gluUnProject(winX, winY, 1.0, modelview, projection, 
              viewport, &reze[0], &reze[1], &reze[2]); 
     
@@ -207,6 +210,7 @@ static void on_mouse(int button, int state, int x, int y)
 
     double norma_vektor_prave=sqrt(pow(vektor_prave[0], 2)+pow(vektor_prave[1], 2)+pow(vektor_prave[2], 2));
     
+    //racunamo korak kojim cemo se kretati po pravoj
     korak1=fabs((reze[0]-rezs[0])*(rezs[0]-c1x)+
                   (reze[1]-rezs[1])*(rezs[1]-c1y)+
                   (reze[2]-rezs[2])*(rezs[2]-c1z))/
@@ -225,13 +229,14 @@ static void on_mouse(int button, int state, int x, int y)
     N1[1]=rezs[1] + vektor_prave[1]/norma_vektor_prave*korak1;
     N1[2]=rezs[2] + vektor_prave[2]/norma_vektor_prave*korak1;
     
- 
+    //razdaljina od centra sfere1
     distance1=sqrt(pow(N1[0]-c1x,2)+pow(N1[1]-c1y, 2)+pow(N1[2]-c1z,2));
     
     N2[0]=rezs[0] + vektor_prave[0]/norma_vektor_prave*korak2;
     N2[1]=rezs[1] + vektor_prave[1]/norma_vektor_prave*korak2;
     N2[2]=rezs[2] + vektor_prave[2]/norma_vektor_prave*korak2;
     
+    //razdaljina od centra sfere2
     distance2=sqrt(pow(N2[0]-c2x,2)+pow(N2[1]-c2y, 2)+pow(N2[2]-c2z,2));
 
     //Proveravamo da li je kliknuto na prvo dugme
@@ -294,7 +299,7 @@ static void on_mouse(int button, int state, int x, int y)
 void on_keyboard(unsigned char key, int x, int y)
 {
         switch (key){
-            
+        
         case 'q':
         case 'Q':
         case 27:
@@ -326,7 +331,7 @@ void on_keyboard(unsigned char key, int x, int y)
             glutPostRedisplay();
         break;
 
-        //Pobeda u prvoj igri, cheat key
+        //Pobeda u prvoj igri, cheat
         case 'l':
             a=rand()%3+1;
             b=a;
@@ -335,7 +340,7 @@ void on_keyboard(unsigned char key, int x, int y)
             glutPostRedisplay();
         break;
 
-        //Pobeda u drugoj igri, cheat key
+        //Pobeda u drugoj igri, cheat
         case  'm':
             d=rand()%4+1;
             e=d;
@@ -422,6 +427,7 @@ void drawString(float x, float y, float z, char *string) {
 void tekst(void){
     char pokusaji[MAX], kredit[MAX], pobede[MAX];
     
+    //pravimo poruke
     sprintf(pokusaji, "POKUSAJI: %d", broj_pokusaji);
     sprintf(kredit, "KREDIT: %d", broj_kredit);
     sprintf(pobede, "POBEDE: %d", broj_pobede);

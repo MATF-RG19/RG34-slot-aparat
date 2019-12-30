@@ -8,7 +8,7 @@ void draw_coordinate_lines(void)
 {
        glColor3f(1.0,0.0,0.0); // red x
     glBegin(GL_LINES);
-    // x aix
+    // x
  
     glVertex3f(-4.0, 0.0f, 0.0f);
     glVertex3f(4.0, 0.0f, 0.0f);

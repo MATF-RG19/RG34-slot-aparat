@@ -7,7 +7,6 @@
 
 #include "../Headers/teksture.h"
 
-//---------------------------TEKSTURE--------------------------------------------
 void teksture(GLuint* names){
     //front
     glBindTexture(GL_TEXTURE_2D, names[0]);
